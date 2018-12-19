@@ -1,0 +1,26 @@
+<ActionBar class="action-bar" [title]="title"></ActionBar>
+    
+<TabView [(ngModel)]="tabSelectedIndex"
+    androidTabsPosition="bottom" 
+    class="tab-view" 
+    android:style="font-size:8"
+    (selectedIndexChanged)="onSelectedIndexChanged($event)"
+    iosIconRenderingMode="alwaysOriginal">
+    <ng-template tabItem title="Find Physician" iconSource="{{ tabSelectedIndex === 0 ? getIconSource('find_doctor_active') : getIconSource('find_doctor') }}">
+        <GridLayout android:style="font-size:16">
+            <SearchComponent></SearchComponent>
+        </GridLayout>
+    </ng-template>
+
+    <ng-template tabItem title="Expense Calculator" iconSource="{{ tabSelectedIndex === 1 ? getIconSource('calculator_active') : getIconSource('calculator') }}">
+        <GridLayout android:style="font-size:16">
+            <CalculatorComponent></CalculatorComponent>
+        </GridLayout>
+    </ng-template>
+
+    <ng-template tabItem title="My Plan" iconSource="{{ tabSelectedIndex === 2 ? getIconSource('profile_active') : getIconSource('profile') }}">
+        <GridLayout android:style="font-size:16">
+            <PlanComponent></PlanComponent>
+        </GridLayout>
+    </ng-template>
+</TabView>

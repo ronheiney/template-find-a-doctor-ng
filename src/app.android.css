@@ -1,0 +1,9 @@
+@import './app-common.css';
+
+.action-button {
+    padding-right: 15;
+}
+
+.platform-button {
+    font-weight: 500;
+}

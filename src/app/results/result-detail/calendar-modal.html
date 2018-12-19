@@ -1,0 +1,12 @@
+<GridLayout rows="auto,*,auto" columns="*,auto" width="100%" height="90%">
+    <StackLayout colSpan="2" class="c-bg-cb p-15" *ngIf="showHeader">
+        <Label text="Pick a date and time for your appointment" textWrap="true" class="t-16 c-white"></Label>
+        <Label [text]="selectedDate.getFullYear()" class="t-16 text-muted"></Label>
+        <Label [text]="formatDate(selectedDate)" class="t-30 c-white font-weight-bold"></Label>
+    </StackLayout>
+    <RadCalendar #appointmentDayPicker (loaded)="onCalendarLoaded()" row="1" colSpan="2" viewMode="Month" transitionMode="Slide" selectionMode="Single" (dateSelected)="onCalendarDateSelected($event)"
+        (dayViewEventSelected)="onCalendarEventSelected($event)" [minDate]="dateToday" [dayViewStyle]="getDayViewStyle()"
+        [monthViewStyle]="getMonthViewStyle()"></RadCalendar>
+    <Button row="2" class="c-cb modal-button pull-right p-15" text="Cancel" (tap)="onCloseButtonTap()"></Button>
+    <Button row="2" col="1" class="c-cb modal-button p-r-15" text="OK" (tap)="onOkButtonTap()" *ngIf="showHeader"></Button>
+</GridLayout>

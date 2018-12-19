@@ -1,0 +1,95 @@
+import { Component, OnInit, ViewChild } from "@angular/core";
+import { Kinvey } from "kinvey-nativescript-sdk";
+import { RouterExtensions } from "nativescript-angular/router";
+import { DataFormEventData } from "nativescript-ui-dataform";
+import { RadDataFormComponent } from "nativescript-ui-dataform/angular";
+import { isIOS } from "tns-core-modules/platform";
+import { alert } from "tns-core-modules/ui/dialogs";
+import { Page } from "tns-core-modules/ui/page";
+
+import { LoginForm } from "./login-form.model";
+import { UserService } from "./shared/user.service";
+
+@Component({
+    selector: "Login",
+    moduleId: module.id,
+    templateUrl: "./login.component.html",
+    styleUrls: ["./login-common.css"]
+})
+export class LoginComponent implements OnInit {
+    @ViewChild("loginFormElement") loginFormElement: RadDataFormComponent;
+    isLoading: boolean;
+
+    private _loginForm: LoginForm;
+
+    constructor(
+        private _page: Page,
+        private _routerExtensions: RouterExtensions
+    ) {}
+
+    ngOnInit(): void {
+        this.isLoading = false;
+
+        this._page.actionBarHidden = true;
+    }
+
+    get loginForm(): LoginForm {
+        return this._loginForm;
+    }
+
+    onLoginRootLoaded(args: any) {
+        this._loginForm = new LoginForm();
+    }
+
+    onEditorUpdate(args: DataFormEventData) {
+        // disable autocapitalization and autocorrection for email field
+        if (isIOS && args.propertyName === "email") {
+            args.editor.editor.autocapitalizationType = UITextAutocapitalizationType.None;
+            args.editor.editor.autocorrectionType = UITextAutocorrectionType.No;
+        }
+    }
+
+    onSigninButtonTap(): void {
+        if (this.loginFormElement.dataForm.hasValidationErrors()) {
+            return;
+        }
+
+        this.isLoading = true;
+
+        UserService.login(this._loginForm.email, this._loginForm.password)
+            .then((user: Kinvey.User) => {
+                this._routerExtensions.navigate(["/root"],
+                    {
+                        clearHistory: true,
+                        animated: true,
+                        transition: {
+                            name: "slide",
+                            duration: 200,
+                            curve: "ease"
+                        }
+                    });
+
+                this.isLoading = false;
+            })
+            .catch((error: Kinvey.BaseError) => {
+                this.isLoading = false;
+                alert({
+                    title: "Login failed",
+                    message: error.message,
+                    okButtonText: "Ok"
+                });
+            });
+    }
+
+    onRegisterButtonTap(): void {
+        this._routerExtensions.navigate(["/login/registration"],
+            {
+                animated: true,
+                transition: {
+                    name: "slide",
+                    duration: 200,
+                    curve: "ease"
+                }
+            });
+    }
+}

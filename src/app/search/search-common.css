@@ -1,0 +1,33 @@
+.filter-button {
+    margin-top: 10;
+    width: 60;
+    height: 60;
+    border-width: 1;
+    border-radius: 30;
+    font-size: 24;
+    color: #5b57d9;
+    background-color: #efeff4;
+    border-color: #efeff4;
+}
+
+.filter-button.selected {
+    color: #efeff4;
+    background-color: #5b57d9;
+    border-color: #5b57d9;
+}
+
+.filter-button.active {
+    border-color: #5b57d9;
+}
+
+.find-button {
+    margin: 10 0;
+}
+
+.outdated {
+    opacity: 0.3;
+}
+
+.zip-code {
+    font-size: 15px;
+}

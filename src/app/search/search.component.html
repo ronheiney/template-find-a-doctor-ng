@@ -1,0 +1,67 @@
+<GridLayout rows="auto,*" columns="*">
+    <StackLayout>
+        <GridLayout rows="auto,auto" columns="*,*" class="m-t-10 m-b-10 p-l-15 p-r-15">
+            <Label text="Search by" class="text-muted text-uppercase t-12"></Label>
+            <Label text="Reset" col="1" class="text-right m-r-5 pink-accent" (tap)="onResetLabelTap()"></Label>
+            
+        </GridLayout>
+        <StackLayout class="hr-light"></StackLayout>
+    </StackLayout>
+    <StackLayout class="result-panel" class="c-bg-lg" row="1">
+        
+        <StackLayout>
+            <StackLayout>
+                <Label text="Location &#xf041;" class=" fa fa-medkit text-muted text-uppercase t-14 p-l-15 p-t-10 p-b-7"></Label>
+                <StackLayout class="hr-light"></StackLayout>
+            </StackLayout>
+            <StackLayout class="c-bg-white zip-code">
+                <GridLayout rows="auto" columns="auto,*">
+                    <Label text="Zip Code" 
+                    class="itemLabel t-19 p-l-15 p-b-10 p-t-10" 
+                    (tap) = "onSelectCurrentLocationTap()"></Label>
+ 
+                    <TextField (textChange)="onZipCodeChange($event)" hint="Enter ZIP code" keyboardType="number" class="pull-right m-r-15" col="2" [(ngModel)]="zipCode"></TextField>
+                </GridLayout>
+                <StackLayout class="hr-light"></StackLayout>
+            </StackLayout>
+        </StackLayout>
+        <Label class="fa fa-medkit text-muted text-uppercase t-14 p-l-15 p-t-10 p-b-7" text="Select Speciality (Choose One) &#xf0fa;"></Label>
+        <GridLayout rows="auto,*"  class="c-bg-white">
+            
+            <SearchBar #specialityFilterSearchBar 
+                hint="Filter..." 
+                (loaded)="specialtySearchBarLoaded($event)" 
+                [visibility]="!isSpecialtyLoading && (specialtyItems && specialtyItems.length) ? 'visible' : 'hidden'"
+                [text]="filterSpecialties" 
+                (textChange)="onTextChanged($event)" 
+                (submit)="onSpecialtyFilterSubmit($event)" 
+                class="c-bg-lg"></SearchBar>
+            <RadListView #specialtyListView [groupingFunction]="specialtyGroupingFunc" row="1" [filteringFunction]="specialtyFilteringFunc"
+                [items]="specialtyItems" selectionBehavior="Press" (itemSelected)="specialtySelected($event)" [itemTemplateSelector]="specialtyListViewTemplateSelector">
+                <ng-template tkListItemTemplate let-item="item">
+                    <GridLayout class="c-bg-white p-t-10 p-l-15" columns="*,auto" rows="*,auto">
+                        <Label [text]="capitalize(item.specialty)" class="itemLabel t-18 p-b-10"></Label>
+                        <Label col="1" text="&#xf00c;" [visibility]="item.selected ? 'visible':'hidden'" class="fa pink-accent t-19 text-right p-r-20 p-b-10"></Label>
+                        <StackLayout row="1" colspan="2" class="hr-light"></StackLayout>
+                    </GridLayout>
+                </ng-template>
+
+                <ng-template tkTemplateKey="last" let-item="item">
+                    <GridLayout class="c-bg-white p-t-10 p-l-15" columns="*,auto" rows="*,auto, 60">
+                        <Label [text]="capitalize(item.specialty)" class="itemLabel t-18 p-b-10"></Label>
+                        <Label col="1" text="&#xf00c;" [visibility]="item.selected ? 'visible':'hidden'" class="fa pink-accent t-19 text-right p-r-20 p-b-10"></Label>
+                        <StackLayout row="1" colspan="2" class="hr-light"></StackLayout>
+                    </GridLayout>
+                </ng-template>
+                
+                <ng-template tkGroupTemplate let-category="category">
+                    <Label [text]="category" height="50" backgroundColor="white" paddingLeft="15"></Label>
+                </ng-template>
+            </RadListView>
+            <ActivityIndicator rowSpan="2" class="activity-indicator" [busy]="isSpecialtyLoading"></ActivityIndicator>
+        </GridLayout>
+    </StackLayout>
+    <StackLayout class="p-t-10" row="1" verticalAlignment="bottom">
+        <Button text="Find Physician" class="find-button platform-button" (tap)="onFindButtonTap()"></Button>
+    </StackLayout>
+</GridLayout>

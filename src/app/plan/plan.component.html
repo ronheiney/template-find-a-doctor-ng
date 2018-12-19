@@ -1,0 +1,125 @@
+<GridLayout>
+    <GridLayout rows="*" columns="*">
+        <StackLayout *ngIf="!isPlan">
+                <StackLayout margin="24" horizontalAlignment="center" verticalAlignment="center">
+                        <GridLayout rows="auto,auto" columns="*,*">
+                            <Label row="0" col="0" colspan="2" class="itemLabel t-18 p-b-10" [text]="addEditPlanText" textwrap="true"></Label>
+                        </GridLayout>
+                        <DropDown #dd
+                        class="state-dropdown p-b-10"
+                        backroundColor="red"
+                        [items]="items"
+                        hint="Select State"
+                        (selectedIndexChanged)="onchange($event)"
+                        row="0"
+                        colSpan="2"></DropDown>
+                        
+                    <GridLayout rows="auto,*"  class="c-bg-white">
+                        <SearchBar #planFilterSearchBar 
+                            hint="Filter..." 
+                            (loaded)="planSearchBarLoaded($event)" 
+                            [visibility]="!isplanLoading && (plans && plans.length) ? 'visible' : 'hidden'"
+                            [text]="filterPlans" 
+                            (textChange)="onTextChanged($event)" 
+                            (submit)="onplanFilterSubmit($event)" 
+                            class="c-bg-lg"></SearchBar>
+                        <RadListView #planListView [groupingFunction]="planGroupingFunc" row="1" [filteringFunction]="planFilteringFunc"
+                            [items]="plans" selectionBehavior="Press" (itemSelected)="planSelected($event)" [itemTemplateSelector]="planListViewTemplateSelector">
+                            <ng-template tkListItemTemplate let-item="item">
+                                <GridLayout class="c-bg-white p-t-10 p-l-15" columns="*,auto" rows="*,auto">
+                                    <Label [text]="capitalize(item.plan_name)" class="itemLabel t-18 p-b-10" textwrap="true"></Label>
+                                    <Label col="1" text="&#xf00c;" [visibility]="item.selected ? 'visible':'hidden'" class="fa pink-accent t-19 text-right p-r-20 p-b-10"></Label>
+                                    <StackLayout row="1" colspan="2" class="hr-light"></StackLayout>
+                                </GridLayout>
+                            </ng-template>
+                
+                            <ng-template tkTemplateKey="last" let-item="item">
+                                <GridLayout class="c-bg-white p-t-10 p-l-15" columns="*,auto" rows="*,auto, 60">
+                                    <Label [text]="capitalize(item.plan_name)" class="itemLabel t-18 p-b-10" textwrap="true"></Label>
+                                    <Label col="1" text="&#xf00c;" [visibility]="item.selected ? 'visible':'hidden'" class="fa pink-accent t-19 text-right p-r-20 p-b-10"></Label>
+                                    <StackLayout row="1" colspan="2" class="hr-light"></StackLayout>
+                                </GridLayout>
+                            </ng-template>
+                            
+                            <ng-template tkGroupTemplate let-category="category">
+                                <Label [text]="category" height="50" backgroundColor="white" paddingLeft="15"></Label>
+                            </ng-template>
+                        </RadListView>
+                        <ActivityIndicator class="activity-indicator" [busy]="isplanLoading"></ActivityIndicator>
+                    </GridLayout> 
+                    </StackLayout>
+                    
+        </StackLayout>
+    <ScrollView *ngIf="isPlan">
+        <StackLayout (loaded)="onLoaded(event)">
+            <StackLayout class="c-bg-lg">
+                <Image *ngIf="noImage" [visibility]="noImage ? 'collapsed' : 'visible'" width="80" height="80" class="p-10 m-x-auto img-circle-large" [src]="item.profile_image"></Image>
+                <Label class="fa c-cb alt-user-image text-center m-20" text="&#xf2be;"></Label>
+                <Label [text]="getUserName(user)" class="font-weight-bold c-black t-25" text="" textAlignment="center" textWrap="true"></Label>
+                <Label *ngIf="item.plan_name" [text]="item.plan_name" class="c-black t-19 p-t-20" textAlignment="center" textWrap="true"></Label>
+                <Label text=" "></Label>
+                <Label text="Edit Plan" class="p-b-10 p-r-20 editPlan" (tap)="editPlanTap()"></Label>
+            </StackLayout>
+            
+                <GridLayout columns="*,*" rows="auto,auto,auto,auto">
+                    <Label row="0" col="0" text="ID" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="0" col="1" [text]="item.plan_id" class="c-cb label-right"></Label>
+                    <StackLayout row="1" colspan="2" class="hr-light m-t-10"></StackLayout>
+                    <Label row="2" col="0" text="Plan Level:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="2" col="1" [text]="item.metallic_level" class="c-cb text-uppercase label-right"></Label>
+                    <StackLayout row="3" colspan="2" class="hr-light m-t-10"></StackLayout>
+                </GridLayout>
+                <Label text="Deductibles" class="c-bg-lg text-uppercase t-14 p-l-15 p-t-10 p-b-7"></Label>
+                <StackLayout class="hr-light"></StackLayout>
+                <GridLayout columns="*,*" rows="auto,auto,auto,auto">
+                    <Label row="0" col="0" text="Individuals:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="0" col="1" [text]="formatCurrency(item.deductible && item.deductible.individual)" class="c-cb label-right"></Label>
+                    <StackLayout row="1" colspan="2" class="hr-light m-t-10"></StackLayout>
+                    <Label row="2" col="0" text="Family:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="2" col="1" [text]="formatCurrency(item.deductible && item.deductible.family)" class="c-cb label-right"></Label>
+                    <StackLayout row="3" colspan="2" class="hr-light m-t-10"></StackLayout>
+                </GridLayout>
+                <Label text="Out of Pocket Maximums" class="c-bg-lg text-uppercase t-14 p-l-15 p-t-10 p-b-7"></Label>
+                <StackLayout class="hr-light"></StackLayout>
+                <GridLayout columns="*,*" rows="auto,auto,auto,auto">
+                    <Label row="0" col="0" text="Individuals:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="0" col="1" [text]="formatCurrency(item.deductible && item.max_out_of_pocket.individual)" class="c-cb label-right"></Label>
+                    <StackLayout row="1" colspan="2" class="hr-light m-t-10"></StackLayout>
+                    <Label row="2" col="0" text="Family:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="2" col="1" [text]="formatCurrency(item.deductible && item.max_out_of_pocket.family)" class="c-cb label-right"></Label>
+                    <StackLayout row="3" colspan="2" class="hr-light m-t-10"></StackLayout>
+                </GridLayout>
+                <Label text="Premiums" class="c-bg-lg text-uppercase t-14 p-l-15 p-t-10 p-b-7"></Label>
+                <StackLayout class="hr-light"></StackLayout>
+                <GridLayout columns="*,*" rows="auto,auto,auto,auto,auto,auto">
+                    <Label row="0" col="0" text="Monthly cost:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="0" col="1" [text]="getTotalCost()" class="c-cb label-right"></Label>
+                    <StackLayout row="1" colspan="2" class="hr-light m-t-10"></StackLayout>
+                    <Label row="2" col="0" text="Adults:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="2" col="1" [text]="getTotalAdults()" class="c-cb label-right"></Label>
+                    <StackLayout row="3" colspan="2" class="hr-light m-t-10"></StackLayout>
+                    <Label row="4" col="0" text="Children:" class="itemLabel m-l-15 t-19 p-t-10"></Label>
+                    <Label row="4" col="1" [text]="getTotalChildren()" class="c-cb label-right"></Label>
+                    <StackLayout row="5" colspan="2" class="hr-light m-t-10"></StackLayout>
+                </GridLayout>
+                <StackLayout class="c-bg-lg">
+                    <Label *ngIf="item.benefits_summary_url" text="Benefits Summary" class="benefits-button c-bg-lg" (tap)="onBenefitsTap(item.benefits_summary_url)"></Label>
+                </StackLayout>
+            
+            
+            <StackLayout>
+                <Label text="Log Out" class="m-l-15 t-19 p-t-10 p-b-10 pink-accent" (tap)="onSignOutButtonTap()"></Label>
+            </StackLayout>
+        </StackLayout>
+    </ScrollView>
+        <ActivityIndicator class="activity-indicator" [busy]="isLoading"></ActivityIndicator>
+        <StackLayout *ngIf="!isPlan && !isEditPlan" verticalAlignment="bottom" class="p-b-5">
+            <Button [class.active]="!!planName" [isEnabled]="!!planName" text="Save" class="submit-button platform-button" (tap)="onSaveButtonTap()"></Button>
+        </StackLayout>
+        <GridLayout *ngIf="!isPlan && isEditPlan" rows="auto" columns="*,*" verticalAlignment="bottom" class="p-b-5">
+            <Button [class.active]="!!planName" [isEnabled]="!!planName" row="0" col="0" text="Save" class="submit-button platform-button p-r-2" (tap)="onSaveButtonTap()"></Button>
+            <Button row="0" col="1" text="Cancel" class="find-button platform-button cancel-button p-l-2" (tap)="onCancelButtonTap()"></Button>
+        </GridLayout>
+    </GridLayout>
+    
+</GridLayout>
